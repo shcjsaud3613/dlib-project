@@ -85,3 +85,84 @@ while True:
 
 ![2](https://user-images.githubusercontent.com/74952376/109069541-b397b200-7734-11eb-8faa-575b177a525f.JPG)
 
+## rectangle을 통해 사각형 표시
+위 콘솔에서 나온 결과는 얼굴 위치를 사각형 좌표값으로 표시한 값이다.
+
+실제로 사각형을 띄워보도록 하겠다. 위에서 콘솔값을 출력한 부분을 수정하도록 하겠다.
+
+```python
+while True:
+    _, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    faces = detector(gray)
+    for face in faces:
+        x1 = face.left()
+        y1 = face.top()
+        x2 = face.right()
+        y2 = face.bottom()
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+
+    cv2.imshow("Frame", frame)
+
+    key = cv2.waitKey(1)
+    if key == 27:
+        break
+```
+
+위 부분을 수정하고 실행하면 얼굴부분에 초록색 사각형이 표시되는 것을 확인할 수 있다.
+
+![3](https://user-images.githubusercontent.com/74952376/109072057-db3c4980-7737-11eb-94e6-9061968826b2.JPG)
+
+## 68개 점으로 landmark 찍기
+이제 landmark를 통해 얼굴에서 68개 점을 추출해보도록 하겠다.
+
+landmark를 찾기 위해서는 "shape_predictor_68_face_landmarks.dat" 파일이 필요하다. 이 파일은 아래 링크에서 받을 수 있다.
+http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+
+압축을 푼 후 dat 파일을 프로젝트 폴더에 넣어준다.
+
+![4](https://user-images.githubusercontent.com/74952376/109072049-da0b1c80-7737-11eb-8f32-0425823e5a7b.JPG)
+
+마지막으로 전체 코드를 수정하고 실행한다.
+
+```python
+import cv2
+import numpy as np
+import dlib
+
+cap = cv2.VideoCapture(0)
+
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+while True:
+    _, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    faces = detector(gray)
+    for face in faces:
+        x1 = face.left()
+        y1 = face.top()
+        x2 = face.right()
+        y2 = face.bottom()
+        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+
+        landmarks = predictor(gray, face)
+
+        for n in range(0, 68):
+            x = landmarks.part(n).x
+            y = landmarks.part(n).y
+            cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
+
+
+    cv2.imshow("Frame", frame)
+
+    key = cv2.waitKey(1)
+    if key == 27:
+        break
+```
+
+아래와 같은 화면이 나오면 성공한 것이다.
+
+![5](https://user-images.githubusercontent.com/74952376/109072055-db3c4980-7737-11eb-98cb-bf373e404f73.JPG)
