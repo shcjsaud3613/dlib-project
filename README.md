@@ -51,3 +51,37 @@ while True:
     if key == 27:
         break
 ```
+
+위 코드를 입력하고 실행하면 아래와 같이 카메라가 촬영한 화면이 나온다.
+
+![1](https://user-images.githubusercontent.com/74952376/109069539-b2668500-7734-11eb-8998-cdf0b890ab5e.JPG)
+
+## get_frontal_face_detector를 통해 얼굴위치 추적
+```python
+import cv2
+import numpy as np
+import dlib
+
+cap = cv2.VideoCapture(0)
+
+detector = dlib.get_frontal_face_detector()
+
+while True:
+    _, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    faces = detector(gray)
+    for face in faces:
+        print(face)
+
+    cv2.imshow("Frame", frame)
+
+    key = cv2.waitKey(1)
+    if key == 27:
+        break
+```
+
+코드를 위와 같이 수정하고 실행하면 사람 얼굴 위치에 따라 콘솔 출력값이 바뀌는 것을 확인할 수 있다.
+
+![2](https://user-images.githubusercontent.com/74952376/109069541-b397b200-7734-11eb-8faa-575b177a525f.JPG)
+
